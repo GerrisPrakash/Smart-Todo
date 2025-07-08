@@ -1,6 +1,8 @@
 import { useTasks } from './hooks/useTasks';
 import { getTaskStatus } from './api/tasks';
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+
 
 export default function App() {
   const { tasks, isLoading, isError, create, update, remove } = useTasks();
@@ -28,64 +30,70 @@ export default function App() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-xl mx-auto bg-white shadow-md rounded-lg p-6">
-        <h1 className="text-2xl font-bold mb-4">Smart Todo List</h1>
+    <div className="min-h-screen bg-gradient-to-tr from-indigo-100 to-white p-4 md:p-10">
+      <div className="max-w-4xl mx-auto bg-white shadow-2xl rounded-xl p-6 md:p-10">
+        <h1 className="text-3xl md:text-4xl font-extrabold text-center mb-8 text-indigo-600">
+          Smart Todo List
+        </h1>
 
-        <div className="flex flex-col gap-2 mb-4">
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
           <input
             type="text"
-            className="border p-2 rounded"
+            className="border p-3 rounded w-full"
             placeholder="Task Title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
-          <textarea
-            className="border p-2 rounded"
-            placeholder="Description (optional)"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
           <input
             type="datetime-local"
-            className="border p-2 rounded"
+            className="border p-3 rounded w-full"
             value={deadline}
             onChange={(e) => setDeadline(e.target.value)}
           />
-          <button
-            onClick={handleAdd}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-          >
-            Add Task
-          </button>
         </div>
+        <textarea
+          className="border p-3 rounded w-full mb-4"
+          placeholder="Description (optional)"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+        <button
+          onClick={handleAdd}
+          className="bg-indigo-600 hover:bg-indigo-700 transition-all duration-300 text-white font-semibold px-6 py-3 rounded w-full md:w-auto"
+        >
+          Add Task
+        </button>
 
-        {isLoading && <p className="text-gray-500">Loading...</p>}
-        {isError && <p className="text-red-500">Error loading tasks.</p>}
+        {isLoading && <p className="text-gray-500 mt-6">Loading...</p>}
+        {isError && <p className="text-red-500 mt-6">Error loading tasks.</p>}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
           {['ongoing', 'success', 'failure'].map((status) => (
             <div key={status}>
-              <h2 className="text-lg font-semibold mb-2 capitalize">
+              <h2 className="text-xl font-semibold mb-4 capitalize text-indigo-700">
                 {status === 'ongoing' ? 'Ongoing' : status === 'success' ? 'Completed' : 'Overdue'}
               </h2>
-              <div className="space-y-2">
+              <AnimatePresence>
                 {grouped[status].length > 0 ? (
                   grouped[status].map((task) => (
-                    <div
+                    <motion.div
                       key={task.id}
-                      className="bg-gray-50 border p-3 rounded shadow-sm flex justify-between items-center"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      layout
+                      className="bg-gray-50 border border-gray-200 p-4 rounded-lg shadow-sm mb-3 flex flex-col justify-between"
                     >
                       <div>
-                        <h3 className="font-medium text-gray-800">{task.title}</h3>
+                        <h3 className="font-semibold text-gray-800 text-lg">{task.title}</h3>
                         {task.description && (
-                          <p className="text-sm text-gray-600 mb-1">{task.description}</p>
+                          <p className="text-sm text-gray-600 mt-1">{task.description}</p>
                         )}
-                        <p className="text-sm text-gray-500">
+                        <p className="text-xs text-gray-500 mt-2">
                           {new Date(task.deadline).toLocaleString()}
                         </p>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex justify-end gap-3 mt-3">
                         <button
                           onClick={() => update(task.id, { isCompleted: !task.isCompleted })}
                           className="text-sm text-green-600 hover:underline"
@@ -94,17 +102,17 @@ export default function App() {
                         </button>
                         <button
                           onClick={() => remove(task.id)}
-                          className="text-sm text-red-600 hover:underline"
+                          className="text-sm text-red-500 hover:underline"
                         >
                           Delete
                         </button>
                       </div>
-                    </div>
+                    </motion.div>
                   ))
                 ) : (
                   <p className="text-sm text-gray-400">No tasks</p>
                 )}
-              </div>
+              </AnimatePresence>
             </div>
           ))}
         </div>
