@@ -12,7 +12,7 @@ export interface Task {
 
 export type TaskStatus = 'ongoing' | 'success' | 'failure';
 
-export const fetchTasks = async () => {
+export const fetchTasks = async (): Promise<Task[]> => {
   const { data, error } = await supabase
     .from('tasks')
     .select('*')
@@ -21,7 +21,7 @@ export const fetchTasks = async () => {
   return data || [];
 };
 
-export const createTask = async (task: any) => {
+export const createTask = async (task: Partial<Task>): Promise<Task> => {
   const { data, error } = await supabase
     .from('tasks')
     .insert([task])
@@ -31,7 +31,7 @@ export const createTask = async (task: any) => {
   return data;
 };
 
-export const updateTask = async (id: any, updates: any) => {
+export const updateTask = async (id: string, updates: Partial<Task>): Promise<Task> => {
   const { data, error } = await supabase
     .from('tasks')
     .update(updates)
@@ -42,12 +42,13 @@ export const updateTask = async (id: any, updates: any) => {
   return data;
 };
 
-export const deleteTask = async (id: any) => {
+export const deleteTask = async (id: string): Promise<void> => {
   const { error } = await supabase.from('tasks').delete().eq('id', id);
   if (error) throw error;
 };
 
-export const getTaskStatus = (task: any) => {
+
+export const getTaskStatus = (task: Task): 'ongoing' | 'success' | 'failure' => {
   const now = new Date();
   const deadline = new Date(task.deadline);
 

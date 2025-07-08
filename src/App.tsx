@@ -1,5 +1,5 @@
 import { useTasks } from './hooks/useTasks';
-import { getTaskStatus } from './api/tasks';
+import { getTaskStatus, type Task } from './api/tasks';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -18,10 +18,10 @@ export default function App() {
     setDeadline('');
   };
 
-  const grouped = {
+  const grouped: Record<'ongoing' | 'success' | 'failure', Task[]> = {
     ongoing: [],
     success: [],
-    failure: []
+    failure: [],
   };
 
   tasks?.forEach((task) => {
@@ -68,7 +68,7 @@ export default function App() {
         {isError && <p className="text-red-500 mt-6">Error loading tasks.</p>}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
-          {['ongoing', 'success', 'failure'].map((status) => (
+          {(['ongoing', 'success', 'failure'] as const).map((status) => (
             <div key={status}>
               <h2 className="text-xl font-semibold mb-4 capitalize text-indigo-700">
                 {status === 'ongoing' ? 'Ongoing' : status === 'success' ? 'Completed' : 'Overdue'}

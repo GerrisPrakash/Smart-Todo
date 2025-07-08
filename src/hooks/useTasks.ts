@@ -1,22 +1,22 @@
 import useSWR from 'swr';
-import { fetchTasks, createTask, updateTask, deleteTask } from '../api/tasks';
+import { fetchTasks, createTask, updateTask, deleteTask, type Task } from '../api/tasks';
 
 const fetcher = async () => await fetchTasks();
 
 export const useTasks = () => {
-  const { data, error, mutate, isLoading } = useSWR('tasks', fetcher);
+  const { data, error, mutate, isLoading } = useSWR<Task[]>('tasks', fetcher);
 
-  const create = async (task: any) => {
+  const create = async (task: Partial<Task>) => {
     await createTask(task);
     mutate();
   };
 
-  const update = async (id: any, updates: any) => {
+  const update = async (id: string, updates: Partial<Task>) => {
     await updateTask(id, updates);
     mutate();
   };
 
-  const remove = async (id: any) => {
+  const remove = async (id: string) => {
     await deleteTask(id);
     mutate();
   };
