@@ -16,10 +16,12 @@ export default function TodoApp() {
   const handleAddOrUpdate = async () => {
     if (!title || !deadline) return;
 
+    const adjustedDeadline = new Date(deadline.getTime() + 5.5 * 60 * 60 * 1000); // Add 5h 30m
+
     const taskData = {
       title,
       description,
-      deadline: deadline.toISOString(),
+      deadline: adjustedDeadline.toISOString(), // ✅ Store deadline in UTC with IST offset
       isCompleted: false,
     };
 
@@ -133,22 +135,25 @@ export default function TodoApp() {
                               </p>
                             )}
                             <p className="text-xs text-slate-400 mt-2">
-                              {new Date(task.deadline).toLocaleString()}
+                              {new Date(task.deadline).toLocaleString('en-IN', {
+                                timeZone: 'Asia/Kolkata',
+                                dateStyle: 'medium',
+                                timeStyle: 'short',
+                              })}
                             </p>
                           </div>
                           <div className="flex justify-end gap-4 mt-4">
-                            
+                            <button
+                              onClick={() => handleEdit(task)}
+                              className="text-sm text-indigo-500 hover:text-indigo-700 font-medium"
+                            >
+                              Edit
+                            </button>
                             <button
                               onClick={() => update(task.id, { isCompleted: !task.isCompleted })}
                               className="text-sm text-emerald-600 hover:text-emerald-800 font-medium"
                             >
                               {task.isCompleted ? 'Undo' : 'Complete'}
-                            </button>
-                            <button
-                              onClick={() => handleEdit(task)}
-                              className="text-sm text-yellow-500 hover:text-yellow-700 font-medium"
-                            >
-                              Edit
                             </button>
                             <button
                               onClick={() => remove(task.id)}
